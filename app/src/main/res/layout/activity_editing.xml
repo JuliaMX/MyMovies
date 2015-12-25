@@ -83,6 +83,14 @@
                 android:rating="0"
                 android:stepSize="0.1" />
 
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:text="@string/watched"
+                android:textSize="20sp"
+                android:id="@+id/checkBox" />
+
         </LinearLayout>
 
         <LinearLayout

@@ -109,7 +109,8 @@ public class SearchActivity extends ListActivity implements AsyncResponse {
                         json.getString("Title"),
                         json.getString("Plot"),
                         json.getString("Poster"),
-                        Float.parseFloat(json.getString("imdbRating")));
+                        Float.parseFloat(json.getString("imdbRating")),
+                        false);
 
                 Intent intent = new Intent(this, EditingActivity.class);
                 intent.putExtra("action", "addFromSearch");

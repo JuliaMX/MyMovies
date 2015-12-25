@@ -11,7 +11,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public DBHelper(Context context) {
         // конструктор суперкласса
-        super(context, "MoviesDB1", null, 1);
+        super(context, "MoviesDB3", null, 1);
     }
 
 
@@ -24,7 +24,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 + "subject text,"
                 + "body text,"
                 + "url text,"
-                + "rating numeric" + ");");
+                + "rating numeric,"
+                + "watched text" + ");");
 
     }
 

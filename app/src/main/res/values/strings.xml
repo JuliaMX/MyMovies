@@ -17,4 +17,5 @@
     <string name="add">Add</string>
     <string name="find">Find</string>
     <string name="check_as_watched">Check as Watched</string>
+    <string name="watched">Watched</string>
 </resources>

@@ -103,6 +103,8 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
             movie.setBody(c.getString(c.getColumnIndex("body")));
             movie.setUrl(c.getString(c.getColumnIndex("url")));
             movie.setRating(c.getFloat(c.getColumnIndex("rating")));
+            movie.setWatched(Boolean.parseBoolean(c.getString(c.getColumnIndex("watched"))));
+
             Log.d(TAG, "get result from cursor:" + movie.toString());
 
             mainMoviesList.add(movie);
@@ -154,6 +156,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
                 intent.putExtra("body", clickedMovie.body);
                 intent.putExtra("url", clickedMovie.url);
                 intent.putExtra("rating", clickedMovie.rating);
+                intent.putExtra("watched", clickedMovie.watched);
 
                 Log.d(TAG, "try to start editing activity");
                 startActivityForResult(intent, REQUEST_CODE_EDITMOVIE);
@@ -215,6 +218,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
                 intent.putExtra("subject", clickedMovie.subject);
                 intent.putExtra("body", clickedMovie.body);
                 intent.putExtra("url", clickedMovie.url);
+                intent.putExtra("watched", clickedMovie.watched);
 
                 Log.d(TAG, "try to start editing activity from context");
                 startActivityForResult(intent, REQUEST_CODE_EDITMOVIE);

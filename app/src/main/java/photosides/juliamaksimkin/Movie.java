@@ -8,58 +8,65 @@ public class Movie {
     public String body;
     public String url;
     public float rating;
+    public boolean watched;
 
 
     public Movie() {
     }
 
-    public Movie(String subject, String body, String url) {
+    public Movie(String subject, String body, String url, boolean watched) {
         this.subject = subject;
         this.body = body;
         this.url = url;
+        this.watched = watched;
     }
 
-    public Movie(String subject) {
+    public Movie(String subject,  boolean watched) {
         this.subject = subject;
     }
 
     public Movie(String _id, String subject) {
         this._id = _id;
         this.subject = subject;
+        this.watched = watched;
     }
 
 
-    public Movie(String _id, String subject, String body, String url) {
+    public Movie(String _id, String subject, String body, String url,  boolean watched) {
         this._id = _id;
         this.subject = subject;
         this.body = body;
         this.url = url;
+        this.watched = watched;
     }
 
-    public Movie(int id, String _id, String subject, String body, String url) {
+    public Movie(int id, String _id, String subject, String body, String url,  boolean watched) {
         this.id = id;
         this._id = _id;
         this.subject = subject;
         this.body = body;
         this.url = url;
+        this.watched = watched;
 
     }
 
-    public Movie(String _id, String subject, String body, String url, float rating) {
+    public Movie(String _id, String subject, String body, String url, float rating,  boolean watched) {
         this._id = _id;
         this.subject = subject;
         this.body = body;
         this.url = url;
         this.rating = rating;
+        this.watched = watched;
     }
 
-    public Movie(int id, String _id, String subject, String body, String url, float rating) {
+    public Movie(int id, String _id, String subject, String body, String url, float rating,  boolean watched) {
         this.id = id;
         this._id = _id;
         this.subject = subject;
         this.body = body;
         this.url = url;
         this.rating = rating;
+        this.watched = watched;
     }
 
     public int getId() {
@@ -110,6 +117,13 @@ public class Movie {
         this.rating = rating;
     }
 
+    public boolean isWatched() {
+        return watched;
+    }
+
+    public void setWatched(boolean watched) {
+        this.watched = watched;
+    }
 
     public String toString() {
         return subject;

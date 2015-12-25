@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -53,8 +54,9 @@ public class EditingActivity extends AppCompatActivity {
             String body = intent.getExtras().getString("body");
             String url = intent.getExtras().getString("url");
             float rating = intent.getExtras().getFloat("rating");
+            boolean watched = intent.getExtras().getBoolean("watched");
 
-            Log.d(TAG, "Starting editActivity with action:" + action + " and item " + subject);
+            Log.d(TAG, "Starting editActivity with action:" + action + " and item " + subject + " watched=" + watched);
 
             //Saving current ID of movie for successful update SQL Table in future
             currentId = id;
@@ -64,12 +66,14 @@ public class EditingActivity extends AppCompatActivity {
             EditText editTextSubject = (EditText) findViewById(R.id.editTextSubject);
             EditText editTextBody = (EditText) findViewById(R.id.editTextBody);
             EditText editTextURL = (EditText) findViewById(R.id.editTextURL);
+            CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
 
             //Fill text fields
             editTextSubject.setText(subject);
             editTextBody.setText(body);
             editTextURL.setText(url);
             ratingBar.setRating(rating);
+            checkBox.setChecked(watched);
 
         }
     }
@@ -79,6 +83,7 @@ public class EditingActivity extends AppCompatActivity {
         EditText editTextSubject = (EditText) findViewById(R.id.editTextSubject);
         EditText editTextBody = (EditText) findViewById(R.id.editTextBody);
         EditText editTextURL = (EditText) findViewById(R.id.editTextURL);
+        CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
 
 
         Log.d(TAG, "pressed button OK, action is: " + action);
@@ -93,6 +98,7 @@ public class EditingActivity extends AppCompatActivity {
         String body = editTextBody.getText().toString();
         String url = editTextURL.getText().toString();
         float rating = ratingBar.getRating();
+        String watched = String.valueOf(checkBox.isChecked());
 
 
         //Делаем проверку все ли поля ввода заполнены
@@ -111,6 +117,7 @@ public class EditingActivity extends AppCompatActivity {
             cv.put("url", url);
             cv.put("_id", current_Id);
             cv.put("rating", rating);
+            cv.put("watched", watched);
 
             if (action.equals("add") || action.equals("addFromSearch")) {
                 Log.d(TAG, "--- Insert in movietable: ---");
