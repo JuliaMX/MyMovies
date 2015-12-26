@@ -2,13 +2,10 @@ package photosides.juliamaksimkin;
 
 import android.app.ListActivity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import org.json.JSONArray;
@@ -22,14 +19,17 @@ public class SearchActivity extends ListActivity implements AsyncResponse {
 
     private static final String TAG = "myLogs";
     private ArrayList<Movie> moviesList = new ArrayList<>();
+    private EditText editTextSearch;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        Log.d(TAG, "OnCreate, ArrayList = "+ moviesList.toString());
+        Log.d(TAG, "OnCreate, ArrayList = " + moviesList.toString());
         refreshList();
+
+        editTextSearch = (EditText) findViewById(R.id.editTextSearch);
     }
 
     public void buttonSearchCancel_onClick(View view) {
@@ -37,7 +37,6 @@ public class SearchActivity extends ListActivity implements AsyncResponse {
     }
 
     public void buttonGo_onClick(View view) {
-        EditText editTextSearch = (EditText) findViewById(R.id.editTextSearch);
 
 
         try {
@@ -63,18 +62,16 @@ public class SearchActivity extends ListActivity implements AsyncResponse {
         }
     }
 
-
     private void sendRequest(URL url) {
 
-        RequestTask requestTask = new RequestTask(this);
-        requestTask.delegate = this;
+        RequestAsyncTask requestAsyncTask = new RequestAsyncTask(this);
+        requestAsyncTask.delegate = this;
 
         //execute the async task
-        requestTask.execute(url);
-        Log.d(TAG, "started requestTask");
+        requestAsyncTask.execute(url);
+        Log.d(TAG, "started requestAsyncTask");
 
     }
-
 
     @Override
     public void processFinish(String response) {
@@ -115,7 +112,6 @@ public class SearchActivity extends ListActivity implements AsyncResponse {
                 Intent intent = new Intent(this, EditingActivity.class);
                 intent.putExtra("action", "addFromSearch");
 
-
                 intent.putExtra("_id", movie._id);
                 intent.putExtra("subject", movie.subject);
                 intent.putExtra("body", movie.body);
@@ -125,8 +121,6 @@ public class SearchActivity extends ListActivity implements AsyncResponse {
                 Log.d(TAG, "try to start editing activity");
                 startActivity(intent);
             }
-
-
 
         } catch (JSONException e) {
             e.printStackTrace();

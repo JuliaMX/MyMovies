@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="25sp"
+            android:singleLine="true"
             android:id="@+id/editTextSearch"/>
 
         <Button
@@ -44,10 +45,11 @@
         android:id="@android:id/list" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="110dp"
+        android:layout_height="60dp"
         android:text="@string/cancel"
         android:textSize="25sp"
+        android:textAllCaps="false"
         android:layout_gravity="center_horizontal"
         android:id="@+id/buttonSearchCancel"
         android:onClick="buttonSearchCancel_onClick"/>

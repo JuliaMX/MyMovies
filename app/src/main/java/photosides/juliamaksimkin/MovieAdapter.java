@@ -1,7 +1,6 @@
 package photosides.juliamaksimkin;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +9,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by Julia on 12/11/2015.
- */
 public class MovieAdapter extends ArrayAdapter<Movie> {
 
     private Activity activity;
@@ -27,8 +23,6 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
         layoutInflater = (LayoutInflater)activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
     }
 
-
-
     public View getView(int position, View convertView, ViewGroup parent){
 
         Movie movie = movies.get(position);
@@ -36,8 +30,6 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
 
         TextView textViewMovieItem = (TextView)itemLayout.findViewById(R.id.textViewMovieItem);
         textViewMovieItem.setText(movie.getSubject());
-
-        //        itemLayout.setTag(new Integer( Integer.valueOf(dataForOneRow[0]) ));
 
         return itemLayout;
     }

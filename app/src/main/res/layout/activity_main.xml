@@ -10,14 +10,6 @@
     android:id="@+id/relativeLayoutMain"
     tools:context=".MainActivity">
 
-    <!--<TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/my_movies"
-        android:id="@+id/textViewMyMovies"
-        android:textSize="40sp"
-        android:textAllCaps="false"/>-->
-
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

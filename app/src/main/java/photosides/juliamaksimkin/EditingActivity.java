@@ -1,8 +1,11 @@
 package photosides.juliamaksimkin;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -18,11 +21,9 @@ import android.widget.Toast;
 
 import java.io.File;
 
-public class EditingActivity extends AppCompatActivity {
+public class EditingActivity extends Activity {
 
-
-    // Photo
-    Uri imageUri;
+    private Uri imageUri;
     private static final int TAKE_PICTURE = 115;
 
     private RatingBar ratingBar;
@@ -31,6 +32,10 @@ public class EditingActivity extends AppCompatActivity {
     private int currentId;
     private String current_Id = "";
     private ImageView imageViewPicture;
+    private EditText editTextSubject;
+    private EditText editTextBody;
+    private EditText editTextURL;
+    private CheckBox checkBox;
 
     private static final String TAG = "myLogs";
 
@@ -40,10 +45,13 @@ public class EditingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editing);
 
         imageViewPicture = (ImageView) findViewById(R.id.imageViewPicture);
+        editTextSubject = (EditText) findViewById(R.id.editTextSubject);
+        editTextBody = (EditText) findViewById(R.id.editTextBody);
+        editTextURL = (EditText) findViewById(R.id.editTextURL);
+        checkBox = (CheckBox) findViewById(R.id.checkBox);
 
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         listenerForRating();
-
 
         Intent intent = getIntent();
         action = intent.getExtras().getString("action");
@@ -63,11 +71,6 @@ public class EditingActivity extends AppCompatActivity {
             //Saving IMDB_ID
             current_Id = _id;
 
-            EditText editTextSubject = (EditText) findViewById(R.id.editTextSubject);
-            EditText editTextBody = (EditText) findViewById(R.id.editTextBody);
-            EditText editTextURL = (EditText) findViewById(R.id.editTextURL);
-            CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
-
             //Fill text fields
             editTextSubject.setText(subject);
             editTextBody.setText(body);
@@ -75,23 +78,32 @@ public class EditingActivity extends AppCompatActivity {
             ratingBar.setRating(rating);
             checkBox.setChecked(watched);
 
+            //try to find file and set image poster
+
+            int ln = url.split("/").length;
+            String filename = url.split("/")[ln - 1];
+
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File (sdCard.getAbsolutePath() + "/tmp/mymovie/cache");
+            File imgFile = new  File(dir, filename);
+
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                imageViewPicture.setImageBitmap(myBitmap);
+            } else {
+                imageViewPicture.setBackgroundResource(R.drawable.no_poster);
+            }
         }
     }
 
-
     public void buttonOK_onClick(View view) {
-        EditText editTextSubject = (EditText) findViewById(R.id.editTextSubject);
-        EditText editTextBody = (EditText) findViewById(R.id.editTextBody);
-        EditText editTextURL = (EditText) findViewById(R.id.editTextURL);
-        CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
-
 
         Log.d(TAG, "pressed button OK, action is: " + action);
 
         DBHelper dbHelper = new DBHelper(this);
 
         // создаем объект для данных
-        ContentValues cv = new ContentValues();
+        ContentValues contentValues = new ContentValues();
 
         // получаем данные из полей ввода
         String subject = editTextSubject.getText().toString();
@@ -99,7 +111,6 @@ public class EditingActivity extends AppCompatActivity {
         String url = editTextURL.getText().toString();
         float rating = ratingBar.getRating();
         String watched = String.valueOf(checkBox.isChecked());
-
 
         //Делаем проверку все ли поля ввода заполнены
 
@@ -112,23 +123,23 @@ public class EditingActivity extends AppCompatActivity {
 
             // подготовим данные для вставки в виде пар: наименование столбца - значение
 
-            cv.put("subject", subject);
-            cv.put("body", body);
-            cv.put("url", url);
-            cv.put("_id", current_Id);
-            cv.put("rating", rating);
-            cv.put("watched", watched);
+            contentValues.put("subject", subject);
+            contentValues.put("body", body);
+            contentValues.put("url", url);
+            contentValues.put("_id", current_Id);
+            contentValues.put("rating", rating);
+            contentValues.put("watched", watched);
 
             if (action.equals("add") || action.equals("addFromSearch")) {
                 Log.d(TAG, "--- Insert in movietable: ---");
                 // вставляем запись и получаем ее ID
-                long rowID = db.insert("movietable1", null, cv);
+                long rowID = db.insert("movietable1", null, contentValues);
                 Log.d(TAG, "row inserted, ID = " + rowID);
 
             } else {
 
                 Log.d(TAG, "Need to update row ID = " + currentId);
-                int updCount = db.update("movietable1", cv, "id = ?",
+                int updCount = db.update("movietable1", contentValues, "id = ?",
                         new String[]{Integer.toString(currentId)});
 
                 Log.d(TAG, "Update done, updCount= " + updCount);
@@ -139,7 +150,6 @@ public class EditingActivity extends AppCompatActivity {
             dbHelper.close();
 
             Intent intent = new Intent();
-            //intent.putExtra("Subject", subject);
             setResult(RESULT_OK, intent);
 
             finish();
@@ -147,26 +157,25 @@ public class EditingActivity extends AppCompatActivity {
 
     }
 
-
     public void buttonCancel_onClick(View view) {
         Intent intent = new Intent();
         setResult(RESULT_CANCELED, intent);
         finish();
     }
 
-
     public void buttonShow_onClick(View view) {
-        EditText editTextURL = (EditText) findViewById(R.id.editTextURL);
+
         String url = editTextURL.getText().toString();
 
-        if(url.equals("N/A") || url.equals("")) {
+        if (url.equals("N/A") || url.equals("")) {
 
-           imageViewPicture.setBackgroundResource(R.drawable.no_poster);
+            imageViewPicture.setBackgroundResource(R.drawable.no_poster);
+
         } else {
             try {
                 new DownloadImageAsyncTask(this)
                         .execute(url);
-            }catch (Exception e) {
+            } catch (Exception e) {
 
                 Log.d(TAG, "Bad request");
 
@@ -191,10 +200,7 @@ public class EditingActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     Uri selectedImageUri = imageUri;
 
-                    ImageView imageViewPicture = (ImageView) findViewById(R.id.imageViewPicture);
                     imageViewPicture.setImageURI(selectedImageUri);
-
-                    EditText editTextURL = (EditText) findViewById(R.id.editTextURL);
                     editTextURL.setText(selectedImageUri.toString());
 
                     Log.d(TAG, "URI: " + selectedImageUri);
@@ -204,14 +210,11 @@ public class EditingActivity extends AppCompatActivity {
 
     public void listenerForRating() {
 
-
         ratingBar.setOnRatingBarChangeListener(
                 new RatingBar.OnRatingBarChangeListener() {
 
                     @Override
                     public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-
-                        Toast.makeText(EditingActivity.this, "Rating: " + String.valueOf(rating), Toast.LENGTH_SHORT).show();
 
                     }
                 }

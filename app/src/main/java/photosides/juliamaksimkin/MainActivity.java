@@ -1,6 +1,7 @@
 package photosides.juliamaksimkin;
 
 import android.app.ActionBar;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -11,17 +12,14 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -39,7 +37,11 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
     //    private ArrayList<String> moviesList;
     private ArrayList<Movie> mainMoviesList;
-    RelativeLayout relativeLayoutMain;
+    //RelativeLayout relativeLayoutMain;
+
+    private Dialog dialogDeleteMovie;
+    private Dialog dialogDeleteAllMovies;
+    private Movie clickedMovie;
 
 
     @Override
@@ -47,16 +49,8 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-/*
-        ActionBar actionBar = getActionBar();
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#f78710")));
-*/
-        /*actionBar.setTitle("My Movies");*/
-
         refreshMovieList();
-
     }
-
 
     public boolean deleteMovie(Movie movie) {
 
@@ -92,18 +86,18 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         //moviesList = new ArrayList<>();
         mainMoviesList = new ArrayList<>();
 
-        Cursor c = db.query("movietable1", null, null, null, null, null, null);
+        Cursor cursor = db.query("movietable1", null, null, null, null, null, null);
         Log.d(TAG, "query done");
 
-        while (c.moveToNext()) {
+        while (cursor.moveToNext()) {
             Movie movie = new Movie();
-            movie.setId(c.getInt(c.getColumnIndex("id")));
-            movie.set_Id(c.getString(c.getColumnIndex("_id")));
-            movie.setSubject(c.getString(c.getColumnIndex("subject")));
-            movie.setBody(c.getString(c.getColumnIndex("body")));
-            movie.setUrl(c.getString(c.getColumnIndex("url")));
-            movie.setRating(c.getFloat(c.getColumnIndex("rating")));
-            movie.setWatched(Boolean.parseBoolean(c.getString(c.getColumnIndex("watched"))));
+            movie.setId(cursor.getInt(cursor.getColumnIndex("id")));
+            movie.set_Id(cursor.getString(cursor.getColumnIndex("_id")));
+            movie.setSubject(cursor.getString(cursor.getColumnIndex("subject")));
+            movie.setBody(cursor.getString(cursor.getColumnIndex("body")));
+            movie.setUrl(cursor.getString(cursor.getColumnIndex("url")));
+            movie.setRating(cursor.getFloat(cursor.getColumnIndex("rating")));
+            movie.setWatched(Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("watched"))));
 
             Log.d(TAG, "get result from cursor:" + movie.toString());
 
@@ -112,17 +106,9 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
         }
 
-        c.close();
+        cursor.close();
         db.close();
         Log.d(TAG, "close DB and cursor");
-
-
-
-
-
-
-
-
 
         //!!!!!!!!!! вот это добавила
         listView = (ListView) findViewById(R.id.listView);
@@ -142,10 +128,8 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
             public void onItemClick(AdapterView<?> arg0,
                                     View arg1, int position, long arg3) {
-                Toast.makeText(MainActivity.this, "LIST ITEM POSITION " + position, Toast.LENGTH_SHORT).show();
 
-
-                Movie clickedMovie = mainMoviesList.get(position);
+                clickedMovie = mainMoviesList.get(position);
 
                 Intent intent = new Intent(MainActivity.this, EditingActivity.class);
                 intent.putExtra("action", "edit");
@@ -161,22 +145,10 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
                 Log.d(TAG, "try to start editing activity");
                 startActivityForResult(intent, REQUEST_CODE_EDITMOVIE);
 
-
-
             }
         });
 
-
-
-
         return;
-
-
-
-
-
-
-
 
        /* MainMovieAdapter adapter = new MainMovieAdapter(this, mainMoviesList);
         setListAdapter(adapter);
@@ -184,12 +156,10 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         return;*/
     }
 
-
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-
 
         // было getListAdapter() вместо listView.getAdapter()
         String title = listView.getAdapter().getItem(info.position).toString();
@@ -204,7 +174,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
         Log.d(TAG, "long click id:" + item.getTitle() + " item from adapter:" + info.position);
-        Movie clickedMovie = mainMoviesList.get(info.position);
+        clickedMovie = mainMoviesList.get(info.position);
 
         switch (item.getTitle().toString()) {
             case "Edit":
@@ -218,6 +188,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
                 intent.putExtra("subject", clickedMovie.subject);
                 intent.putExtra("body", clickedMovie.body);
                 intent.putExtra("url", clickedMovie.url);
+                intent.putExtra("rating", clickedMovie.rating);
                 intent.putExtra("watched", clickedMovie.watched);
 
                 Log.d(TAG, "try to start editing activity from context");
@@ -225,10 +196,22 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
                 return true;
 
             case "Delete":
-                Log.d(TAG, "context delete clickedMovie " + clickedMovie.toString());
-                deleteMovie(clickedMovie);
-                refreshMovieList();
+
+                dialogDeleteMovie = new Dialog(this);
+                dialogDeleteMovie.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialogDeleteMovie.setContentView(R.layout.dialog_delete_movie);
+                dialogDeleteMovie.setCancelable(false);
+                dialogDeleteMovie.show();
+
                 return true;
+
+            case "Check as Watched":
+
+
+
+
+                return true;
+
             default:
                 return super.onContextItemSelected(item);
         }
@@ -288,22 +271,13 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
     }
 
-    //Жмем на клавишу "Опции" в верхнем правом углу
-    /*public void imageButtonOptions_onClick(View view) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-    ImageButton imageButtonOptions = (ImageButton) findViewById(R.id.imageButtonOptions);
-      imageButtonOptions.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-              Log.d(TAG, "button");
-              openOptionsMenu();
+        getMenuInflater().inflate(R.menu.menu_options, menu);
+        return true;
 
-
-          }
-      });
-
-    }*/
-
+    }
     public void openOptionsMenu() {
         super.openOptionsMenu();
         Configuration config = getResources().getConfiguration();
@@ -317,39 +291,25 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
         }
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //return super.onCreateOptionsMenu(menu);
-
-        getMenuInflater().inflate(R.menu.menu_options, menu);
-        return true;
-
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //
 
         switch (item.getItemId()) {
 
             case R.id.deleteAllMovies:
 
-                Toast.makeText(this, "Delete All Movies!", Toast.LENGTH_SHORT).show();
+                dialogDeleteAllMovies = new Dialog(this);
+                dialogDeleteAllMovies.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialogDeleteAllMovies.setContentView(R.layout.dialog_delete_all_movies);
+                dialogDeleteAllMovies.setCancelable(false);
+                dialogDeleteAllMovies.show();
 
-                DBHelper dbHelper = new DBHelper(this);
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                Log.d(TAG, "delete");
-                int result = db.delete("movietable1", "1", null);
-                db.close();
-                Log.d(TAG, "close DB and cursor" + result);
-                refreshMovieList();
+
 
                 break;
 
             case R.id.exit:
 
-                Toast.makeText(this, "Exit!", Toast.LENGTH_SHORT).show();
                 finish();
                 break;
         }
@@ -357,15 +317,38 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
     }
 
+    public void buttonDeleteMovie_onClick(View view) {
 
+        deleteMovie(clickedMovie);
+        refreshMovieList();
+        dialogDeleteMovie.dismiss();
+    }
 
+    public void buttonDeleteMovieCancel_onClick(View view) {
+        dialogDeleteMovie.dismiss();
+    }
 
+    public void buttonDeleteAllMovies_onClick(View view) {
 
+        DBHelper dbHelper = new DBHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        Log.d(TAG, "delete");
+        int result = db.delete("movietable1", "1", null);
+        db.close();
+        Log.d(TAG, "close DB and cursor" + result);
+        refreshMovieList();
+
+        dialogDeleteAllMovies.dismiss();
+    }
+
+    public void buttonDeleteAllMoviesCancel_onClick(View view) {
+        dialogDeleteAllMovies.dismiss();
+    }
 
 
     // Код из интернета для Hard Button
 
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
+    /*public boolean onKeyUp(int keyCode, KeyEvent event) {
         Log.d(TAG, "Hard button!" + keyCode);
 
         if (keyCode == KeyEvent.KEYCODE_MENU) {
@@ -373,8 +356,7 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
             return true;
         }
         return super.onKeyUp(keyCode, event);
-    }
-
+    }*/
 
 
     /*@Override
@@ -391,25 +373,6 @@ public class MainActivity extends ActionBarActivity implements PopupMenu.OnMenuI
 
         return super.onKeyDown(keycode, e);
     }*/
-
-
-    //для короткого нажатия
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

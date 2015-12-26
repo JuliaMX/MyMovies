@@ -14,8 +14,10 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="rate">Rate Me:</string>
-    <string name="add">Add</string>
-    <string name="find">Find</string>
+    <string name="add">Add a Movie</string>
+    <string name="find">Find in Internet</string>
     <string name="check_as_watched">Check as Watched</string>
     <string name="watched">Watched</string>
+    <string name="are_you_sure">Are You Sure?</string>
+    <string name="you_want_delete_all_movies">You want delete all movies.</string>
 </resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="200dp"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="3dp"
+        android:src="@drawable/delete" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/are_you_sure"
+        android:layout_gravity="center_vertical"
+        android:textSize="25sp"/>
+
+</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/buttonDeleteMovie"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:onClick="buttonDeleteMovie_onClick"
+            android:text="@string/delete"
+            android:textSize="20sp"
+            android:textAllCaps="false"/>
+
+        <Button
+            android:id="@+id/buttonDeleteMovieCancel"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:onClick="buttonDeleteMovieCancel_onClick"
+            android:layout_marginLeft="10dp"
+            android:text="@string/cancel"
+            android:textSize="20sp"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+
+</LinearLayout>

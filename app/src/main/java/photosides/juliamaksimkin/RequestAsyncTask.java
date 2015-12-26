@@ -10,14 +10,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class RequestTask extends AsyncTask<URL, Void, String> {
+public class RequestAsyncTask extends AsyncTask<URL, Void, String> {
     private Activity activity;
     private ProgressDialog dialog;
     private static final String TAG = "myLogs";
 
     public AsyncResponse delegate = null;
 
-    public RequestTask(Activity activity) {
+    public RequestAsyncTask(Activity activity) {
         this.activity = activity;
     }
 
