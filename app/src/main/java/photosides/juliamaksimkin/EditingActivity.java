@@ -86,7 +86,7 @@ public class EditingActivity extends Activity {
                 Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                 imageViewPicture.setImageBitmap(myBitmap);
             } else {
-                imageViewPicture.setBackgroundResource(R.drawable.no_poster);
+                imageViewPicture.setBackgroundResource(R.drawable.no_poster_img);
             }
         }
     }
@@ -145,7 +145,7 @@ public class EditingActivity extends Activity {
 
         String url = editTextURL.getText().toString();
         if (url.equals("N/A") || url.equals("")) {
-            imageViewPicture.setBackgroundResource(R.drawable.no_poster);
+            imageViewPicture.setBackgroundResource(R.drawable.no_poster_img);
         } else {
             try {
                 new DownloadImageAsyncTask(this)

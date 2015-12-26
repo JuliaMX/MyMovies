@@ -61,7 +61,7 @@ public class MainMovieAdapter extends ArrayAdapter<Movie> {
             Log.d(TAG, "image exist" + filename);
         } else {
             Log.d(TAG, "image not exist" + filename);
-            imageViewPicture.setBackgroundResource(R.drawable.no_poster);
+            imageViewPicture.setBackgroundResource(R.drawable.no_poster_img);
         }
 
         ImageView imageViewOverlay = (ImageView) itemLayout.findViewById(R.id.imageViewOverlay);
