@@ -6,24 +6,16 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
 public class DownloadImageAsyncTask extends AsyncTask<String, String, Bitmap>  {
     ImageView movieImage;
-//        private ProgressDialog dialog;
-//        private Activity activity;
     private Activity activity;
     private ProgressBar progressBarLoad;
     private TextView textViewLoad;
@@ -33,7 +25,6 @@ public class DownloadImageAsyncTask extends AsyncTask<String, String, Bitmap>  {
             this.activity = activity;
     }
 
-
     protected void onPreExecute() {
         progressBarLoad = (ProgressBar)activity.findViewById(R.id.progressBarLoad);
         textViewLoad = (TextView)activity.findViewById(R.id.textViewLoad);
@@ -42,21 +33,13 @@ public class DownloadImageAsyncTask extends AsyncTask<String, String, Bitmap>  {
 
     protected Bitmap doInBackground(String... urls) {
         url = urls[0];
-//        String urlDisplay = urls[0];
-
-        //Bitmap mIcon11 = null;
         Bitmap picture = null;
         int count;
 
         try {
             int lengthOfFile = new java.net.URL(url).openConnection().getContentLength();
-
-            Log.d(TAG, "Size of image:" + lengthOfFile);
-
             InputStream input = new java.net.URL(url).openStream();
-
             OutputStream output = new FileOutputStream("/sdcard/tmp_picture.tmp");
-
 
             byte data[] = new byte[1024];
             long total = 0;
@@ -64,24 +47,16 @@ public class DownloadImageAsyncTask extends AsyncTask<String, String, Bitmap>  {
                 total += count;
                 // publishing the progress....
                 // After this onProgressUpdate will be called
-
                 int percentDone = (int)(((long)total * 100) / lengthOfFile);
-
                 publishProgress(Integer.toString(percentDone));
-
                 output.write(data, 0, count);
-
             }
 
             output.flush();
-            // closing streams
             output.close();
             input.close();
 
-            Log.d(TAG, "before decode stream");
-
             picture = BitmapFactory.decodeFile("/sdcard/tmp_picture.tmp");
-//            mIcon11 = BitmapFactory.decodeStream(input);
             Log.d(TAG, "after decode stream");
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
@@ -100,20 +75,12 @@ public class DownloadImageAsyncTask extends AsyncTask<String, String, Bitmap>  {
             textViewLoad.setText("100 %");
             textViewLoad.setText("");
         }
-
-        Log.d(TAG, "progress update");
     }
 
     protected void onPostExecute(Bitmap result) {
-//            dialog.dismiss();
-
-        //Save image to file for cache
 
         int ln = url.split("/").length;
         String filename = url.split("/")[ln - 1];
-
-        Log.d(TAG, "postexec: " + filename);
-
         File sdCard = Environment.getExternalStorageDirectory();
         File dir = new File (sdCard.getAbsolutePath() + "/tmp/mymovie/cache");
         dir.mkdirs();
@@ -124,7 +91,6 @@ public class DownloadImageAsyncTask extends AsyncTask<String, String, Bitmap>  {
             result.compress(Bitmap.CompressFormat.PNG, 90, out);
             out.flush();
             out.close();
-            Log.d(TAG, "saved file: " + dir.toString() + filename);
 
         } catch (Exception e) {
             e.printStackTrace();

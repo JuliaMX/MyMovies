@@ -14,7 +14,6 @@ public class RequestAsyncTask extends AsyncTask<URL, Void, String> {
     private Activity activity;
     private ProgressDialog dialog;
     private static final String TAG = "myLogs";
-
     public AsyncResponse delegate = null;
 
     public RequestAsyncTask(Activity activity) {
@@ -22,24 +21,17 @@ public class RequestAsyncTask extends AsyncTask<URL, Void, String> {
     }
 
     protected void onPreExecute() {
-
         dialog = new ProgressDialog(activity);
         dialog.setTitle("Connecting...");
         dialog.setMessage("Please Wait...");
         dialog.show();
-
     }
 
     protected String doInBackground(URL... params) {
-
         try {
-
             URL url = params[0];
-
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
             int httpStatusCode = connection.getResponseCode();
-
             if (httpStatusCode == HttpURLConnection.HTTP_BAD_REQUEST) {
                 return "No Such Symbol";
             }
@@ -52,7 +44,6 @@ public class RequestAsyncTask extends AsyncTask<URL, Void, String> {
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
             String result = "";
-
             String oneLine = bufferedReader.readLine();
 
             while (oneLine != null) {
@@ -69,7 +60,6 @@ public class RequestAsyncTask extends AsyncTask<URL, Void, String> {
     @Override
     protected void onPostExecute(String response) {
         dialog.dismiss();
-        Log.d(TAG, "Request finished, sending responce to SearchActivity = " + response);
         delegate.processFinish(response);
     }
 }

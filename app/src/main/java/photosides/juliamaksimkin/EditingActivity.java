@@ -1,17 +1,16 @@
 package photosides.juliamaksimkin;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -20,17 +19,18 @@ import android.widget.RatingBar;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 public class EditingActivity extends Activity {
 
+    private MoviesLogic moviesLogic;
+
     private Uri imageUri;
     private static final int TAKE_PICTURE = 115;
-
     private RatingBar ratingBar;
 
     private static String action;
     private int currentId;
-    private String current_Id = "";
     private ImageView imageViewPicture;
     private EditText editTextSubject;
     private EditText editTextBody;
@@ -43,13 +43,14 @@ public class EditingActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editing);
+        moviesLogic = new MoviesLogic(this);
+        moviesLogic.open();
 
         imageViewPicture = (ImageView) findViewById(R.id.imageViewPicture);
         editTextSubject = (EditText) findViewById(R.id.editTextSubject);
         editTextBody = (EditText) findViewById(R.id.editTextBody);
         editTextURL = (EditText) findViewById(R.id.editTextURL);
         checkBox = (CheckBox) findViewById(R.id.checkBox);
-
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         listenerForRating();
 
@@ -64,13 +65,8 @@ public class EditingActivity extends Activity {
             float rating = intent.getExtras().getFloat("rating");
             boolean watched = intent.getExtras().getBoolean("watched");
 
-            Log.d(TAG, "Starting editActivity with action:" + action + " and item " + subject + " watched=" + watched);
-
             //Saving current ID of movie for successful update SQL Table in future
             currentId = id;
-            //Saving IMDB_ID
-            current_Id = _id;
-
             //Fill text fields
             editTextSubject.setText(subject);
             editTextBody.setText(body);
@@ -79,7 +75,6 @@ public class EditingActivity extends Activity {
             checkBox.setChecked(watched);
 
             //try to find file and set image poster
-
             int ln = url.split("/").length;
             String filename = url.split("/")[ln - 1];
 
@@ -96,66 +91,49 @@ public class EditingActivity extends Activity {
         }
     }
 
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        /*moviesLogic.open();*/
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        /*moviesLogic.close();*/
+    }
+
+
+
     public void buttonOK_onClick(View view) {
 
-        Log.d(TAG, "pressed button OK, action is: " + action);
+        Movie movie = new Movie();
+        movie.setSubject(editTextSubject.getText().toString());
+        movie.setBody(editTextBody.getText().toString());
+        movie.setUrl(editTextURL.getText().toString());
+        movie.setRating(ratingBar.getRating());
+        movie.setWatched(checkBox.isChecked());
 
-        DBHelper dbHelper = new DBHelper(this);
-
-        // создаем объект для данных
-        ContentValues contentValues = new ContentValues();
-
-        // получаем данные из полей ввода
-        String subject = editTextSubject.getText().toString();
-        String body = editTextBody.getText().toString();
-        String url = editTextURL.getText().toString();
-        float rating = ratingBar.getRating();
-        String watched = String.valueOf(checkBox.isChecked());
-
-        //Делаем проверку все ли поля ввода заполнены
-
-        if (subject.equals("") || body.equals("")) {
-            Toast.makeText(this, "Error! Please enter a full information!", Toast.LENGTH_SHORT).show();
+        if (movie.getSubject().equals("") || movie.getBody().equals("")) {
+            Toast toast = Toast.makeText(this, "Error! Please enter a full information!", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
         } else {
-
-            // подключаемся к БД
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-            // подготовим данные для вставки в виде пар: наименование столбца - значение
-
-            contentValues.put("subject", subject);
-            contentValues.put("body", body);
-            contentValues.put("url", url);
-            contentValues.put("_id", current_Id);
-            contentValues.put("rating", rating);
-            contentValues.put("watched", watched);
-
             if (action.equals("add") || action.equals("addFromSearch")) {
-                Log.d(TAG, "--- Insert in movietable: ---");
-                // вставляем запись и получаем ее ID
-                long rowID = db.insert("movietable1", null, contentValues);
-                Log.d(TAG, "row inserted, ID = " + rowID);
-
+                long createdId = moviesLogic.addMovie(movie);
             } else {
-
-                Log.d(TAG, "Need to update row ID = " + currentId);
-                int updCount = db.update("movietable1", contentValues, "id = ?",
-                        new String[]{Integer.toString(currentId)});
-
-                Log.d(TAG, "Update done, updCount= " + updCount);
+                movie.setId(currentId);
+                long affectedRows = moviesLogic.updateMovie(movie);
             }
-
-            // закрываем подключение к БД
-
-            dbHelper.close();
 
             Intent intent = new Intent();
             setResult(RESULT_OK, intent);
-
             finish();
         }
 
     }
+
 
     public void buttonCancel_onClick(View view) {
         Intent intent = new Intent();
@@ -166,19 +144,14 @@ public class EditingActivity extends Activity {
     public void buttonShow_onClick(View view) {
 
         String url = editTextURL.getText().toString();
-
         if (url.equals("N/A") || url.equals("")) {
-
             imageViewPicture.setBackgroundResource(R.drawable.no_poster);
-
         } else {
             try {
                 new DownloadImageAsyncTask(this)
                         .execute(url);
             } catch (Exception e) {
-
                 Log.d(TAG, "Bad request");
-
             }
         }
     }
@@ -199,11 +172,27 @@ public class EditingActivity extends Activity {
             case TAKE_PICTURE:
                 if (resultCode == RESULT_OK) {
                     Uri selectedImageUri = imageUri;
-
                     imageViewPicture.setImageURI(selectedImageUri);
-                    editTextURL.setText(selectedImageUri.toString());
+                    Bitmap bitmap = ((BitmapDrawable)imageViewPicture.getDrawable()).getBitmap();
+                    int ln = selectedImageUri.toString().split("/").length;
+                    String filename = selectedImageUri.toString().split("/")[ln - 1];
+                    File sdCard = Environment.getExternalStorageDirectory();
+                    File dir = new File (sdCard.getAbsolutePath() + "/tmp/mymovie/cache");
+                    dir.mkdirs();
+                    File file = new File(dir, currentId + filename);
 
-                    Log.d(TAG, "URI: " + selectedImageUri);
+                    try {
+                        FileOutputStream out = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                        out.flush();
+                        out.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    editTextURL.setText(dir.toString() + "/" + currentId + filename);
+                    Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+                    imageViewPicture.setImageBitmap(myBitmap);
                 }
         }
     }
@@ -211,15 +200,11 @@ public class EditingActivity extends Activity {
     public void listenerForRating() {
 
         ratingBar.setOnRatingBarChangeListener(
-                new RatingBar.OnRatingBarChangeListener() {
+            new RatingBar.OnRatingBarChangeListener() {
 
-                    @Override
-                    public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-
-                    }
-                }
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {}
+            }
         );
-
     }
-
 }

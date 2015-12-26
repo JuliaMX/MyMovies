@@ -19,7 +19,6 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
         super(activity, 0, movies);
         this.activity = activity;
         this.movies = movies;
-
         layoutInflater = (LayoutInflater)activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -27,7 +26,6 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
 
         Movie movie = movies.get(position);
         View itemLayout = layoutInflater.inflate(R.layout.item_movie, null);
-
         TextView textViewMovieItem = (TextView)itemLayout.findViewById(R.id.textViewMovieItem);
         textViewMovieItem.setText(movie.getSubject());
 

@@ -1,6 +1,5 @@
 package photosides.juliamaksimkin;
 
-
 public class Movie {
     public int id;
     public String _id;
@@ -10,9 +9,7 @@ public class Movie {
     public float rating;
     public boolean watched;
 
-
-    public Movie() {
-    }
+    public Movie() {}
 
     public Movie(String subject, String body, String url, boolean watched) {
         this.subject = subject;
@@ -28,9 +25,7 @@ public class Movie {
     public Movie(String _id, String subject) {
         this._id = _id;
         this.subject = subject;
-        this.watched = watched;
     }
-
 
     public Movie(String _id, String subject, String body, String url,  boolean watched) {
         this._id = _id;
@@ -47,7 +42,6 @@ public class Movie {
         this.body = body;
         this.url = url;
         this.watched = watched;
-
     }
 
     public Movie(String _id, String subject, String body, String url, float rating,  boolean watched) {
@@ -128,5 +122,4 @@ public class Movie {
     public String toString() {
         return subject;
     }
-
 }

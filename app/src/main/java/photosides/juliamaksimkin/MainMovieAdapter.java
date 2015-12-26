@@ -64,7 +64,6 @@ public class MainMovieAdapter extends ArrayAdapter<Movie> {
             imageViewPicture.setBackgroundResource(R.drawable.no_poster);
         }
 
-
         ImageView imageViewOverlay = (ImageView) itemLayout.findViewById(R.id.imageViewOverlay);
         if (!movie.isWatched()){
             imageViewOverlay.setAlpha(0);
@@ -72,7 +71,6 @@ public class MainMovieAdapter extends ArrayAdapter<Movie> {
 
         RatingBar ratingBar = (RatingBar) itemLayout.findViewById(R.id.ratingBar);
         ratingBar.setRating(movie.getRating());
-
         return itemLayout;
     }
 }
