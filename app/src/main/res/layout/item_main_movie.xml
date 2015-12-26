@@ -8,12 +8,25 @@
         android:layout_width="wrap_content"
         android:layout_height="200dp">
 
-        <ImageView
-            android:id="@+id/imageViewPicture"
-            android:layout_width="120dp"
-            android:layout_height="170dp"
-            android:layout_gravity="center_vertical"
-            android:scaleType="fitCenter" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imageViewPicture"
+                android:layout_width="120dp"
+                android:layout_height="170dp"
+                android:layout_gravity="center_vertical"
+                android:scaleType="fitCenter" />
+            <ImageView
+                android:id="@+id/imageViewOverlay"
+                android:layout_width="50dp"
+                android:layout_height="70dp"
+                android:src="@drawable/watch"
+                android:layout_gravity="center_vertical"
+                android:scaleType="fitCenter" />
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"

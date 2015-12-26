@@ -65,6 +65,11 @@ public class MainMovieAdapter extends ArrayAdapter<Movie> {
         }
 
 
+        ImageView imageViewOverlay = (ImageView) itemLayout.findViewById(R.id.imageViewOverlay);
+        if (!movie.isWatched()){
+            imageViewOverlay.setAlpha(0);
+        }
+
         RatingBar ratingBar = (RatingBar) itemLayout.findViewById(R.id.ratingBar);
         ratingBar.setRating(movie.getRating());
 
