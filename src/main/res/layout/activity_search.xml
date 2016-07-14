@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:orientation="vertical"
+    android:id="@+id/linearLayoutSearch"
+    tools:context="photosides.juliamaksimkin.SearchActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search"
+            android:textSize="25sp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="25sp"
+            android:singleLine="true"
+            android:id="@+id/editTextSearch"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/go"
+            android:textSize="25sp"
+            android:id="@+id/buttonGo"
+            android:onClick="buttonGo_onClick"/>
+
+    </LinearLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:id="@android:id/list" />
+
+    <Button
+        android:layout_width="110dp"
+        android:layout_height="60dp"
+        android:text="@string/cancel"
+        android:textSize="25sp"
+        android:textAllCaps="false"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/buttonSearchCancel"
+        android:onClick="buttonSearchCancel_onClick"/>
+
+</LinearLayout>
